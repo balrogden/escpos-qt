@@ -390,6 +390,16 @@ EscPosPrinter &EscPosPrinter::setPrintingWidth(int value)
   return *this;
 }
 
+int EscPosPrinter::getRawStatus(char mode)
+{
+  const char str[] = { '\x10', '\x04', mode};
+  write(str, sizeof(str));
+  QByteArray data = m_device->read(1);
+  write(str, sizeof(str)-1 );
+  return data[0];
+
+}
+
 EscPosPrinter::PrinterStatuses EscPosPrinter::getStatus()
 {
   const char str[] = { '\x10', '\x04', '\x14'};
@@ -400,7 +410,6 @@ EscPosPrinter::PrinterStatuses EscPosPrinter::getStatus()
     QByteArray data = m_device->read(6);
     if(data.length()>=6)
     {
-      result.setFlag( PrinterStatusOnline );
       qDebug() << int(data[0]) << int(data[1]);
       if(data[2]&0x01)
         result.setFlag( PrinterStatusPaperEnd );
@@ -413,6 +422,8 @@ EscPosPrinter::PrinterStatuses EscPosPrinter::getStatus()
       if(data[4]&0x40)
         result.setFlag( PrinterStatusPaperJam );
     }
+    else
+      result.setFlag( PrinterStatusNotFound );
   }
   write(str, sizeof(str)-1 );
   return result;

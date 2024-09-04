@@ -160,7 +160,7 @@ public:
     EscPosPrinter &setPrintingWidth(int value);
     EscPosPrinter &setFontSize(int x, int y);
 
-    enum PrinterStatus {PrinterStatusOnline = 0x01,
+    enum PrinterStatus {PrinterStatusNotFound = 0x01,
                        PrinterStatusCoverOpened = 0x02,
                        PrinterStatusPaperEnd  = 0x04,
                        PrinterStatusPaperNearEnd  = 0x08,
@@ -168,6 +168,7 @@ public:
                        PrinterStatusOtherDeviceError = 0x20};
     Q_DECLARE_FLAGS(PrinterStatuses, PrinterStatus);
     PrinterStatuses getStatus();
+    int getRawStatus(char mode);
 
 //public Q_SLOTS:
     //void getStatus();
