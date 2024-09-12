@@ -142,8 +142,8 @@ public:
     static void standardMode() {}
     static void pageMode() {}
 
-    void write(const QByteArray &data);
-    void write(const char *data, int size);
+    int write(const QByteArray &data);
+    int write(const char *data, int size);
 
     EscPosPrinter &initialize();
     EscPosPrinter &encode(Encoding codec);

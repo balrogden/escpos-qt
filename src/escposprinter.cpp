@@ -242,14 +242,14 @@ EscPosPrinter &EscPosPrinter::operator<<(const QImage &img)
   return *this;
 }
 
-void EscPosPrinter::write(const QByteArray &data)
+int EscPosPrinter::write(const QByteArray &data)
 {
-    m_device->write(data);
+    return m_device->write(data);
 }
 
-void EscPosPrinter::write(const char *data, int size)
+int EscPosPrinter::write(const char *data, int size)
 {
-    m_device->write(data, size);
+    return m_device->write(data, size);
 }
 
 EscPosPrinter &EscPosPrinter::initialize()
@@ -403,14 +403,15 @@ int EscPosPrinter::getRawStatus(char mode)
 EscPosPrinter::PrinterStatuses EscPosPrinter::getStatus()
 {
   const char str[] = { '\x10', '\x04', '\x14'};
-  write(str, sizeof(str));
+  int len = write(str, sizeof(str));
+  qCDebug(EPP) << "status query writed len:" << len;
   EscPosPrinter::PrinterStatuses result;
   //if(m_device->bytesAvailable()>=6)
   {
     QByteArray data = m_device->read(6);
-    if(data.length()>=6)
+    if( data.length()>=6 && len == sizeof(str) && data[1] != 4 /* должно біть 0x0f*/ )
     {
-      qDebug() << int(data[0]) << int(data[1]);
+      qCDebug(EPP) << "status:" << int(data[0]) << int(data[1]) << int(data[2]) << int(data[3]) << int(data[4]) << int(data[5]);
       if(data[2]&0x01)
         result.setFlag( PrinterStatusPaperEnd );
       if(data[2]&0x04)
